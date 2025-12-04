@@ -1,16 +1,17 @@
 services:
   laravel.test:
     build:
-      context: ./vendor/laravel/sail/runtimes/8.3
+      context: .
       dockerfile: Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
-    image: 'sail-8.3/app'
+    image: 'sail-8.4/app'
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     ports:
-      - '${APP_PORT:-8000}:80'
-      - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+      {/*- '80:9000'*/}
+      - '${APP_PORT:-8000}:9000'
+    
     environment:
       WWWUSER: '${WWWUSER}'
       LARAVEL_SAIL: 1
@@ -18,7 +19,7 @@ services:
       XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
       IGNITION_LOCAL_SITES_PATH: '${PWD}'
     volumes:
-      - '.:/var/www/html'
+      - .:/var/www/html
     networks:
       - sail
     depends_on:

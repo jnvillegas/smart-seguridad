@@ -34,3 +34,5 @@ storage/framework/views
 storage/framework/cache
 .env
 .git
+docker-compose.override.yml
+

@@ -13,9 +13,9 @@ use App\Http\Controllers\Treasury\ClientAttachmentController;
 use App\Http\Controllers\Treasury\ReceiptController;
 use App\Http\Controllers\Treasury\BankEntityController;
 use App\Http\Controllers\Treasury\BankAccountController;
+use App\Http\Controllers\Treasury\PaymentOrderController;
+use App\Http\Controllers\Treasury\CashWithdrawalController;
 use App\Http\Controllers\DashboardController;
-
-
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -23,20 +23,15 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-   Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-
-    // Rutas de Treasury - Clientes
+    // ========================================
+    // MÓDULO TREASURY (TESORERÍA)
+    // ========================================
     Route::prefix('treasury')->name('treasury.')->group(function () {
 
-        // CRUD de Clientes
+        // -------------------- CLIENTES --------------------
         Route::resource('clients', ClientController::class);
-
-
-        // Recibos
-        Route::resource('receipts', ReceiptController::class);
-        Route::get('receipts/{receipt}/download-pdf', [ReceiptController::class, 'downloadPdf'])
-            ->name('receipts.download-pdf');
 
         // Exportaciones de Clientes
         Route::get('clients-export/excel', [ClientController::class, 'exportExcel'])
@@ -68,33 +63,62 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('clients/{client}/attachments/{attachment}', [ClientAttachmentController::class, 'destroy'])
             ->name('clients.attachments.destroy');
 
+        // -------------------- RECIBOS --------------------
+        Route::resource('receipts', ReceiptController::class);
+        Route::get('receipts/{receipt}/download-pdf', [ReceiptController::class, 'downloadPdf'])
+            ->name('receipts.download-pdf');
+
+        // -------------------- ÓRDENES DE PAGO --------------------
+        Route::resource('payment-orders', PaymentOrderController::class)->names([
+            'index' => 'payment-orders.index',
+            'create' => 'payment-orders.create',
+            'store' => 'payment-orders.store',
+            'show' => 'payment-orders.show',
+            'edit' => 'payment-orders.edit',
+            'update' => 'payment-orders.update',
+            'destroy' => 'payment-orders.destroy',
+        ]);
+
+                // -------------------- EGRESOS DE CAJA --------------------
+        Route::resource('cash-withdrawals', CashWithdrawalController::class)->names([
+            'index' => 'cash-withdrawals.index',
+            'create' => 'cash-withdrawals.create',
+            'store' => 'cash-withdrawals.store',
+            'show' => 'cash-withdrawals.show',
+            'edit' => 'cash-withdrawals.edit',
+            'update' => 'cash-withdrawals.update',
+            'destroy' => 'cash-withdrawals.destroy',
+        ]);
+
+        // Cambiar estado de egreso de caja
+        Route::post('cash-withdrawals/{cashWithdrawal}/change-status', [CashWithdrawalController::class, 'changeStatus'])
+            ->name('cash-withdrawals.change-status');
+
+        
+        // Cambiar estado de orden de pago
+        Route::post('payment-orders/{paymentOrder}/change-status', [PaymentOrderController::class, 'changeStatus'])
+            ->name('payment-orders.change-status');
+
+        // -------------------- BANCOS --------------------
         // Entidades Bancarias
         Route::resource('bank-entities', BankEntityController::class)->names('bank-entities');
 
         // Cuentas Bancarias
         Route::resource('bank-accounts', BankAccountController::class)->names('bank-accounts');
-
-
     });
 
+    // ========================================
+    // ADMINISTRACIÓN DE USUARIOS Y ROLES
+    // ========================================
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);
-
 });
 
-// Solo usuarios con el permiso 'delete-users' pueden acceder.
-Route::delete('/users/{user}', [UserController::class, 'destroy'])->middleware('permission:delete-users');
-
-
-
-// O puedes proteger un grupo de rutas:
-/*Route::middleware('permission:edit-posts')->group(function () {
-    Route::get('/posts/{post}/edit', [PostController::class, 'edit']);
-    Route::put('/posts/{post}', [PostController::class, 'update']);
-});*/
-
-
-
+// ========================================
+// RUTAS CON PERMISOS ESPECÍFICOS
+// ========================================
+Route::delete('/users/{user}', [UserController::class, 'destroy'])
+    ->middleware('permission:delete-users');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

@@ -79,6 +79,17 @@ const modulesNavItems: NavItem[] = [
                 href: '/treasury/bank-accounts',
                 icon: CreditCard,
             },
+            {
+                title: 'Ordenes de Pago',
+                href: '/treasury/payment-orders',
+                icon: CreditCard,
+            },
+            {
+                title: 'Egresos de Caja',
+                href: '/treasury/cash-withdrawals',
+                icon: CreditCard, // o el icono que uses
+            }
+
         ],
     },
 ];

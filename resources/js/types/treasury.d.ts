@@ -235,3 +235,231 @@ export interface BankAccountFormData {
   activa?: boolean;
   observaciones?: string;
 }
+
+// ==========================================
+// ÓRDENES DE PAGO (PAYMENT ORDERS)
+// ==========================================
+
+export type PaymentOrderStatus = 'en_proceso' | 'cerrada' | 'anulada';
+
+export type PaymentType = 
+  | 'efectivo'
+  | 'cheque_propio'
+  | 'cheque_terceros'
+  | 'transferencia'
+  | 'tarjeta'
+  | 'nota_credito'
+  | 'nota_credito_interna'
+  | 'compensacion';
+
+export interface PaymentOrderValue {
+  id?: number;
+  payment_order_id?: number;
+  payment_type: PaymentType;
+  amount: number;
+  currency: string;
+  exchange_rate: number;
+  check_number?: string;
+  check_date?: string;
+  bank_entity_id?: number;
+  bank_account_id?: number;
+  reference?: string;
+  bank_entity?: BankEntity;
+  bank_account?: BankAccount;
+  payment_type_label?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface PaymentOrderWithholding {
+  id?: number;
+  payment_order_id?: number;
+  tax_id: number;
+  percentage: number;
+  amount: number;
+  aliquot: number;
+  payment_commitment?: string;
+  certificate_number?: string;
+  tax?: Tax;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface PaymentOrder {
+  id: number;
+  supplier_id: number;
+  user_id: number;
+  branch_office_id?: number;
+  cash_register_id?: number;
+  cost_center_id?: number;
+  number: string;
+  date: string;
+  concept: string;
+  detail?: string;
+  status: PaymentOrderStatus;
+  is_advance: boolean;
+  currency: string;
+  exchange_rate: number;
+  exchange_rate_date?: string;
+  subtotal: number;
+  total_withholdings: number;
+  total: number;
+  amount_paid: number;
+  balance: number;
+  supplier?: Client;
+  user?: User;
+  values?: PaymentOrderValue[];
+  withholdings?: PaymentOrderWithholding[];
+  status_label?: string;
+  status_color?: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at?: string;
+}
+
+export interface PaymentOrderFormData {
+  supplier_id: number;
+  branch_office_id?: number;
+  cash_register_id?: number;
+  cost_center_id?: number;
+  date: string;
+  concept: string;
+  detail?: string;
+  is_advance: boolean;
+  currency: string;
+  exchange_rate: number;
+  exchange_rate_date?: string;
+  values: PaymentOrderValue[];
+  withholdings: PaymentOrderWithholding[];
+}
+
+// Tipo auxiliar para Tax (impuestos)
+export interface Tax {
+  id: number;
+  name: string;
+  code: string;
+  type: 'retencion' | 'percepcion';
+  percentage: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CashRegister {
+  id: number;
+  name: string;
+}
+
+export interface CostCenter {
+  id: number;
+  code: string;
+  name: string;
+}
+
+export interface CashWithdrawalItem {
+  id?: number;
+  cash_withdrawal_id?: number;
+  concept: string;
+  observation?: string;
+  amount: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type CashWithdrawalStatus = 'en_proceso' | 'cerrado' | 'anulado';
+
+export interface CashWithdrawal {
+  id: number;
+  number: string;
+  date: string;
+  recipient: string;
+  reason: string;
+  detail?: string;
+  cash_register_id?: number;
+  cost_center_id?: number;
+  currency: string;
+  total: string | number;
+  status: CashWithdrawalStatus;
+  observations?: string;
+  created_at: string;
+  updated_at: string;
+
+  items?: CashWithdrawalItem[];
+  cash_register?: CashRegister;
+  cost_center?: CostCenter;
+  user?: {
+    id: number;
+    name: string;
+  };
+}
+
+/**
+ * Paginado genérico (lo usan index.tsx)
+ */
+export interface PaginatedResponse<T> {
+  data: T[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+// ===============================
+// EGRESOS DE CAJA
+// ===============================
+
+export interface CashRegister {
+  id: number;
+  name: string;
+}
+
+export interface CostCenter {
+  id: number;
+  code: string;
+  name: string;
+}
+
+export interface CashWithdrawalItem {
+  id?: number;
+  cash_withdrawal_id?: number;
+  concept: string;
+  observation?: string;
+  amount: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type CashWithdrawalStatus = 'en_proceso' | 'cerrado' | 'anulado';
+
+export interface CashWithdrawal {
+  id: number;
+  number: string;
+  date: string;
+  recipient: string;
+  reason: string;
+  detail?: string;
+  cash_register_id?: number;
+  cost_center_id?: number;
+  currency: string;
+  total: string | number;
+  status: CashWithdrawalStatus;
+  observations?: string;
+  created_at: string;
+  updated_at: string;
+
+  items?: CashWithdrawalItem[];
+  cash_register?: CashRegister;
+  cost_center?: CostCenter;
+  user?: {
+    id: number;
+    name: string;
+  };
+}
+
+// Paginado genérico (lo usan varios index)
+export interface PaginatedResponse<T> {
+  data: T[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
